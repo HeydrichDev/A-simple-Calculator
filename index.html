@@ -146,53 +146,71 @@
 
     <script>
         const $screen = document.querySelector(".screen")
-        let resultado;
-        const CONTAINER = ["", "", ""]
+        let result;
+        let operators = false
+        let relaod = false
+        let dot = false
+        const CONTAINER = [
+            "", //FIRST NUMBER
+            "", // OPERATOR
+            "", // SECOND NUMBER
+            `` //RESULT
+        ]
 
         const calculet = () => {
-            
-            if (CONTAINER[1] === "x") resultado = parseInt(CONTAINER[0]) * parseInt(CONTAINER[2])
-            if (CONTAINER[1] === "+") resultado = parseInt(CONTAINER[0]) + parseInt(CONTAINER[2])
-            if (CONTAINER[1] === "-") resultado = parseInt(CONTAINER[0]) - parseInt(CONTAINER[2])
-            if (CONTAINER[1] === "÷") {
-                resultado = parseInt(CONTAINER[0]) / parseInt(CONTAINER[2])
-                resultado.toString()
-                console.log(resultado)
-            }
 
-            return resultado
+            if (CONTAINER[1] === "+") CONTAINER[3] = `${parseInt(CONTAINER[0]) + parseInt(CONTAINER[2])}`
+            if (CONTAINER[1] === "x") CONTAINER[3] = `${parseInt(CONTAINER[0]) * parseInt(CONTAINER[2])}`
+            if (CONTAINER[1] === "-") CONTAINER[3] = `${parseInt(CONTAINER[0]) - parseInt(CONTAINER[2])}`
+            if (CONTAINER[1] === "÷") CONTAINER[3] = `${parseInt(CONTAINER[0]) / parseInt(CONTAINER[2]) }`
+
+            CONTAINER[3].slice(0, 10)
+        }
+        const cleanContainer = () => {
+            for(let i = 0; i < CONTAINER.length; i++){
+                CONTAINER[i] = ""
+            }
         }
 
         document.addEventListener("DOMContentLoaded", e => {
+
+            
             document.addEventListener("click", e => {
+                if(relaod) {
+                    $screen.innerHTML = "0"
+                    cleanContainer()
+                }
 
                 //Number Buttons
                 if (e.target.matches(".number-buttons") && !e.target.matches(".dot")) {
                     if ($screen.innerHTML === "0") $screen.innerHTML = null
-                    if (localStorage.getItem("operators") !== "true") CONTAINER[0] += e.target.innerHTML
-                    if (localStorage.getItem("operators") === "true") CONTAINER[2] += e.target.innerHTML
+                    if (!operators) CONTAINER[0] += e.target.innerHTML
+                    if (operators) CONTAINER[2] += e.target.innerHTML
 
+                    relaod = false
                     $screen.innerHTML += e.target.innerHTML
                 }
 
                 //Dot button
                 if (e.target.matches(".dot") && $screen.innerHTML !== "0") {
-                    if (localStorage.getItem("dot")) return
-                    localStorage.setItem("dot", true)
+                    if (dot) return
+                    dot = true
+
                     $screen.innerHTML += e.target.innerHTML
                     CONTAINER[0] += e.target.innerHTML
                 }
 
                 //Operator Buttons
                 if (e.target.matches(".operator-buttons")) {
-                    if (localStorage.getItem("operators") === "true") return
-                    if(CONTAINER[0].split("").filter(item => item === ".").length === 1){
+                    if (operators) return
+                    if (CONTAINER[0].split("").filter(item => item === ".").length === 1) {
                         CONTAINER[0] += "0"
                         $screen.innerHTML += "0"
                     }
 
-                    localStorage.setItem("operators", "true")
-                    localStorage.removeItem("dot")
+                    operators = true
+                    dot = false
+
                     CONTAINER[1] = e.target.innerHTML
                     $screen.innerHTML += e.target.innerHTML
                 }
@@ -200,18 +218,18 @@
                 //button C
                 if (e.target.matches(".button-C") && $screen.innerHTML !== "0") {
                     $screen.innerHTML = "0"
-                    localStorage.removeItem("operators")
-                    localStorage.removeItem("dot")
+                    operators = false
+                    dot = false
 
-                    for (let i = 0; i < CONTAINER.length; i++) {
-                        CONTAINER[i] = ""
-                    }
+                    cleanContainer()
                 }
 
                 //Iqual Button
                 if (e.target.matches(".iqual-button")) {
-                    $screen.innerHTML = `${calculet()}`
-                    localStorage.removeItem("operators")
+                    calculet()
+                    $screen.innerHTML = CONTAINER[3]
+                    operators = false
+                    relaod = true
                 }
 
                 console.log(CONTAINER)
