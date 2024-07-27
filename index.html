@@ -116,7 +116,6 @@
     <main class="main-content">
 
         <section class="calculator">
-            <h2>Puta Calculadora</h2>
 
             <article class="screen">0</article>
 
@@ -127,7 +126,7 @@
                 <div class="number-buttons">7</div>
                 <div class="number-buttons">8</div>
                 <div class="number-buttons">9</div>
-                <div class="operator-buttons">&times;</div>
+                <div class="operator-buttons">x</div>
                 <div class="number-buttons">4</div>
                 <div class="number-buttons">5</div>
                 <div class="number-buttons">6</div>
@@ -147,16 +146,21 @@
 
     <script>
         const $screen = document.querySelector(".screen")
-        const resultado = 0
+        let resultado;
         const CONTAINER = ["", "", ""]
 
         const calculet = () => {
+            
             if (CONTAINER[1] === "x") resultado = parseInt(CONTAINER[0]) * parseInt(CONTAINER[2])
             if (CONTAINER[1] === "+") resultado = parseInt(CONTAINER[0]) + parseInt(CONTAINER[2])
             if (CONTAINER[1] === "-") resultado = parseInt(CONTAINER[0]) - parseInt(CONTAINER[2])
-            if (CONTAINER[1] === "÷") resultado = parseInt(CONTAINER[0]) / parseInt(CONTAINER[2])
+            if (CONTAINER[1] === "÷") {
+                resultado = parseInt(CONTAINER[0]) / parseInt(CONTAINER[2])
+                resultado.toString()
+                console.log(resultado)
+            }
 
-            console.log(resultado.toString())
+            return resultado
         }
 
         document.addEventListener("DOMContentLoaded", e => {
@@ -182,7 +186,7 @@
                 //Operator Buttons
                 if (e.target.matches(".operator-buttons")) {
                     if (localStorage.getItem("operators") === "true") return
-                    if(CONTAINER[0].split("").filter(item => item === ".")){
+                    if(CONTAINER[0].split("").filter(item => item === ".").length === 1){
                         CONTAINER[0] += "0"
                         $screen.innerHTML += "0"
                     }
@@ -204,14 +208,14 @@
                     }
                 }
 
+                //Iqual Button
                 if (e.target.matches(".iqual-button")) {
-                    $screen.innerHTML = calculet()
+                    $screen.innerHTML = `${calculet()}`
+                    localStorage.removeItem("operators")
                 }
 
                 console.log(CONTAINER)
             })
-
-
         })
 
     </script>
