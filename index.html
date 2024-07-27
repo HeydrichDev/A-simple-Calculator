@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        /*      Variables       */
+        :root {
+            --bg-color: #666;
+            --bg-color-dark: #444;
+            --first-color: rgb(204, 204, 204);
+            --first-color-alpha: rgba(204, 204, 204, .7);
+            --second-color: rgb(238, 147, 10);
+            --second-color-alpha: rgba(238, 147, 10, .7)
+        }
+
+        /*      Reset Styles    */
+        html {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: inherit;
+        }
+
+        .main-content {
+            min-height: 100dvh;
+            background-color: #666;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calculator {
+            background-color: var(--bg-color-dark);
+            width: 300px;
+            border-radius: 2rem;
+            padding: 1.75rem;
+        }
+
+        .calculator .screen {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            overflow-x: hidden;
+            padding: .25rem;
+            font-size: 2rem;
+            background-color: var(--first-color);
+            width: 100%;
+            height: 50px;
+            border-radius: .25rem;
+            margin-bottom: 1rem;
+        }
+
+        .calculator .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .buttons div {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 1rem;
+            padding: .75rem;
+            cursor: pointer;
+            transition: opacity .2s ease-in-out;
+
+            display: grid;
+            place-content: center;
+
+            &:hover {
+                opacity: .7;
+            }
+        }
+
+        .number-buttons {
+            background-color: var(--first-color-alpha);
+        }
+
+        .operator-buttons,
+        .button-C,
+        .iqual-button {
+            background-color: var(--second-color);
+        }
+
+        .button-C {
+            grid-column: span 3;
+            background: var(--second-color-alpha);
+        }
+
+        .iqual-button {
+            grid-column: span 2;
+            background: var(--second-color-alpha);
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="main-content">
+
+        <section class="calculator">
+            <h2>Puta Calculadora</h2>
+
+            <article class="screen">0</article>
+
+            <article class="buttons">
+
+                <div class="button-C">C</div>
+                <div class="operator-buttons">&divide;</div>
+                <div class="number-buttons">7</div>
+                <div class="number-buttons">8</div>
+                <div class="number-buttons">9</div>
+                <div class="operator-buttons">&times;</div>
+                <div class="number-buttons">4</div>
+                <div class="number-buttons">5</div>
+                <div class="number-buttons">6</div>
+                <div class="operator-buttons">-</div>
+                <div class="number-buttons">1</div>
+                <div class="number-buttons">2</div>
+                <div class="number-buttons">3</div>
+                <div class="operator-buttons">&plus;</div>
+                <div class="number-buttons">0</div>
+                <div class="number-buttons dot">.</div>
+                <div class="iqual-button"> = </div>
+            </article>
+
+        </section>
+
+    </main>
+
+    <script>
+        const $screen = document.querySelector(".screen")
+        const resultado = 0
+        const CONTAINER = ["", "", ""]
+
+        const calculet = () => {
+            if (CONTAINER[1] === "x") resultado = parseInt(CONTAINER[0]) * parseInt(CONTAINER[2])
+            if (CONTAINER[1] === "+") resultado = parseInt(CONTAINER[0]) + parseInt(CONTAINER[2])
+            if (CONTAINER[1] === "-") resultado = parseInt(CONTAINER[0]) - parseInt(CONTAINER[2])
+            if (CONTAINER[1] === "÷") resultado = parseInt(CONTAINER[0]) / parseInt(CONTAINER[2])
+
+            console.log(resultado.toString())
+        }
+
+        document.addEventListener("DOMContentLoaded", e => {
+            document.addEventListener("click", e => {
+
+                //Number Buttons
+                if (e.target.matches(".number-buttons") && !e.target.matches(".dot")) {
+                    if ($screen.innerHTML === "0") $screen.innerHTML = null
+                    if (localStorage.getItem("operators") !== "true") CONTAINER[0] += e.target.innerHTML
+                    if (localStorage.getItem("operators") === "true") CONTAINER[2] += e.target.innerHTML
+
+                    $screen.innerHTML += e.target.innerHTML
+                }
+
+                //Dot button
+                if (e.target.matches(".dot") && $screen.innerHTML !== "0") {
+                    if (localStorage.getItem("dot")) return
+                    localStorage.setItem("dot", true)
+                    $screen.innerHTML += e.target.innerHTML
+                    CONTAINER[0] += e.target.innerHTML
+                }
+
+                //Operator Buttons
+                if (e.target.matches(".operator-buttons")) {
+                    if (localStorage.getItem("operators") === "true") return
+                    if(CONTAINER[0].split("").filter(item => item === ".")){
+                        CONTAINER[0] += "0"
+                        $screen.innerHTML += "0"
+                    }
+
+                    localStorage.setItem("operators", "true")
+                    localStorage.removeItem("dot")
+                    CONTAINER[1] = e.target.innerHTML
+                    $screen.innerHTML += e.target.innerHTML
+                }
+
+                //button C
+                if (e.target.matches(".button-C") && $screen.innerHTML !== "0") {
+                    $screen.innerHTML = "0"
+                    localStorage.removeItem("operators")
+                    localStorage.removeItem("dot")
+
+                    for (let i = 0; i < CONTAINER.length; i++) {
+                        CONTAINER[i] = ""
+                    }
+                }
+
+                if (e.target.matches(".iqual-button")) {
+                    $screen.innerHTML = calculet()
+                }
+
+                console.log(CONTAINER)
+            })
+
+
+        })
+
+    </script>
+</body>
+
+</html>
